@@ -25,6 +25,8 @@ import { AdminAuthSeederModule } from './admin/seeder/admin-auth-seeder.module';
 import { AdminAuthSeederService } from './admin/seeder/admin-auth-seeder.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CityModule } from './city/city.module';
+import { CategoryModule } from './category/category.module';
+import { FatwaQueriesModule } from './fatwa-queries/fatwa-queries.module';
 
 @Module({
   imports: [
@@ -65,6 +67,8 @@ import { CityModule } from './city/city.module';
     UserAuthSeederModule,
     AdminAuthSeederModule,
     CityModule,
+    CategoryModule,
+    FatwaQueriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

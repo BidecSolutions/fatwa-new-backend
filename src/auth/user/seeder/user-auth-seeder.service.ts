@@ -20,7 +20,7 @@ export class UserAuthSeederService {
 
     @InjectRepository(UserRole)
     private readonly userRoleRepo: Repository<UserRole>,
-  ) {}
+  ) { }
 
   async seed(): Promise<void> {
     // // Delete old users by email if they exist
@@ -30,11 +30,11 @@ export class UserAuthSeederService {
     await this.seedUser({
       name: 'Customer User',
       email: 'user@gmail.com',
-      password: '123456789',   
+      password: '123456789',
       roleName: 'user',
     });
 
-    
+
   }
 
   private async deleteUserWithRoles(email: string): Promise<void> {
@@ -65,6 +65,12 @@ export class UserAuthSeederService {
     roleName: string;
   }) {
     const hashedPassword = await bcrypt.hash(password, 10);
+    const existing = await this.userRepo.findOne({ where: { email } });
+    if (existing) {
+      this.logger.warn(`User with email ${email} already exists. Skipping.`);
+      return;
+    }
+
     const newUser = this.userRepo.create({
       name,
       email,

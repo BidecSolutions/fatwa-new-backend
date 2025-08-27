@@ -19,11 +19,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   address: string;
 
-  @IsNotEmpty()
-  city_id: number;
-
-  @IsNotEmpty()
-  zone_id: number;
+  @IsOptional()
+  city: number;
 
   @IsOptional()
   image: string;

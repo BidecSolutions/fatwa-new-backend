@@ -12,6 +12,7 @@ import { UserDetails } from './user_details.entity';
 import { Exclude } from 'class-transformer';
 import { UserRole } from 'src/assig-roles-user/entity/user-role.entity';
 import { City } from 'src/city/entity/city.entity';
+import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
 
 @Entity()
 export class User {
@@ -37,6 +38,11 @@ export class User {
   @Column({ nullable: true })
   gender: string;
 
+  @OneToMany(() => Fatwa, (fatwa) => fatwa.client)
+  fatwas: Fatwa[];
+  
+
+
   @Column({ nullable: true })
   street: string;
 
@@ -46,31 +52,34 @@ export class User {
   @Column({ nullable: true })
   image: string;
 
- /*  @Column({
-    type: 'geography',
-    spatialFeatureType: 'Point',
-    nullable: true,
-    srid: 4326,
-    comment: 'User location in longitude and latitude',
-  })
-  location: string; */
-
-  @Column({nullable: true})
-  longitude: string;
-
-  @Column({nullable: true})
-  latitude: string;
+  /*  @Column({
+     type: 'geography',
+     spatialFeatureType: 'Point',
+     nullable: true,
+     srid: 4326,
+     comment: 'User location in longitude and latitude',
+   })
+   location: string; */
 
   @Column({ nullable: true })
-  city_id: number;
+  longitude: string;
 
-  @ManyToOne(() => City, { onDelete: 'CASCADE', eager: true })
-  @JoinColumn({ name: 'city_id' })
-  city: City;
+  @Column({ nullable: true })
+  latitude: string;
 
-  
+  // @Column({ nullable: true })
+  // city_id: number;
 
-  
+  // @ManyToOne(() => City, { onDelete: 'CASCADE', eager: true })
+  // @JoinColumn({ name: 'city_id' })
+  // city: City;
+
+  @Column({ nullable: true })
+  city: string;
+
+
+
+
 
   @Column({
     type: 'smallint',
@@ -101,7 +110,7 @@ export class User {
 
   @Column({ type: 'date' })
   updated_at: string;
-  
+
 
   @BeforeInsert()
   setCreateDateParts() {

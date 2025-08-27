@@ -30,7 +30,7 @@ export class UsersService {
     private userRoleRepo: Repository<UserRole>,
     @InjectRepository(City)
     private cityRepo: Repository<City>,
-   
+
   ) { }
 
   /* ─────────────────────────────── CREATE USER ─────────────────────────────── */
@@ -43,8 +43,6 @@ export class UsersService {
         throw new BadRequestException('User with this email already exists');
 
       if (dto.password) dto.password = await bcrypt.hash(dto.password, 10);
-      const city = await this.cityRepo.findOne({ where: { id: dto.city_id } });
-      if (!city) throw new NotFoundException('City not found');
       const saved = await this.userRepository.save(
         this.userRepository.create({
           name: dto.name,
@@ -52,8 +50,6 @@ export class UsersService {
           password: dto.password,
           phone: dto.phone,
           address: dto.address,
-          city_id: dto.city_id,
-          city: city,
           image: dto.image,
         }),
       );
@@ -64,7 +60,7 @@ export class UsersService {
         user: saved,
         role_id: role.id,
         role: role,
-        
+
       });
       await this.userRoleRepo.save(userRole);
       const { password, access_token, ...clean } = saved;
@@ -83,7 +79,7 @@ export class UsersService {
   async idnex() {
     // kept the original route name; consider renaming to "index" later
     try {
-      const users = await this.userRepository.find({ relations: ['details'] });
+      const users = await this.userRepository.find();
       const data = users.map(({ password, access_token, ...rest }) => rest);
       return { success: true, message: 'User list', data };
     } catch (err) {

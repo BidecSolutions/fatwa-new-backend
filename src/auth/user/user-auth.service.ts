@@ -41,7 +41,7 @@ export class UserAuthService {
 
     private readonly dataSource: DataSource,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   private handleUnknown(err: unknown): never {
     if (
@@ -75,12 +75,7 @@ export class UserAuthService {
       }
 
       // Validate city and zone
-      if (body.city_id) {
-        const city = await queryRunner.manager.findOne(City, {
-          where: { id: body.city_id },
-        });
-        if (!city) throw new NotFoundException('City not found');
-      }
+
 
       const user = await queryRunner.manager.getRepository(User).create({
         name: body.name,
@@ -88,7 +83,6 @@ export class UserAuthService {
         password: body.password,
         phone: body.phone,
         gender: body.gender,
-        city_id: body.city_id,
       });
       const savedUser = await queryRunner.manager.save(User, user);
       // const savedUser = await this.userRepository.save(user);
@@ -245,9 +239,9 @@ export class UserAuthService {
           user: cleanUser,
           role: userRole
             ? {
-                id: userRole.id,
-                name: userRole.name,
-              }
+              id: userRole.id,
+              name: userRole.name,
+            }
             : null,
         },
       };

@@ -14,8 +14,9 @@ export class RolesSeederService {
   async seed() {
     const defaultRoles = [
       { name: 'admin', guard: 'admin' },
-      { name: 'manager', guard: 'admin' },
       { name: 'user', guard: 'user' },
+      { name: 'teacher', guard: 'user' },
+      { name: 'student', guard: 'user' },
     ];
 
     for (const roleData of defaultRoles) {

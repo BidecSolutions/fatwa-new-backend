@@ -16,7 +16,7 @@ export class Admin {
   @Column({ nullable: true })
   name: string;
 
-  @Column()
+  @Column({unique: true})
   email: string;
 
   @Column()
