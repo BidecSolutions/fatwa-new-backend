@@ -26,27 +26,27 @@ export class FatwaQueriesController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Get()
+  @Get('index')
   async findAll() {
     return this.fatwaService.findAll();
   }
 
   
   @UseGuards(AdminJwtAuthGuard)
-  @Get(':id')
+  @Get('findone:id')
   async findOne(@Param('id') id: number) {
     return this.fatwaService.findOne(+id);
   }
 
   
   @UseGuards(AdminJwtAuthGuard)
-  @Patch(':id')
+  @Patch('update:id')
   async update(@Param('id') id: number, @Body() dto: UpdateFatwaDto) {
     return this.fatwaService.update(+id, dto);
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Patch(':id/toggle')
+  @Patch('tooglestatus:id/toggle')
   async toggle(@Param('id') id: number) {
     return this.fatwaService.toggleStatus(+id);
   }

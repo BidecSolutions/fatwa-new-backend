@@ -39,7 +39,6 @@ export class FatwaQueriesService {
         const fatwa = this.fatwaRepository.create({
             subject: dto.subject,
             question: dto.question,
-            answer: dto.answer ?? null,
             reviewed: dto.reviewed ?? false,
             status: 1,
             category_id: dto.categoryId,
