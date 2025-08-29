@@ -5,9 +5,14 @@ import {
     ManyToOne,
     BeforeInsert,
     JoinColumn,
+    OneToMany,
 } from 'typeorm';
 import { User } from 'src/users/entity/user.entity';
 import { FatwaCategory } from 'src/category/entity/category.entity';
+import { FatwaAssignment } from 'src/fatwa-assignments/entity/fatwa-assignment.entity';
+import { FatwaStatus } from 'src/common/enums/fatwah.enum';
+
+
 
 @Entity()
 export class Fatwa {
@@ -20,35 +25,34 @@ export class Fatwa {
     @Column()
     question: string;
 
-    @Column({ type: 'text', nullable: true })
-    answer: string | null;
-
-    @Column({ default: false })
-    reviewed: boolean;
-
     @Column()
     category_id: number;
 
+
+    @OneToMany(() => FatwaAssignment, (assignment) => assignment.fatwaQuery)
+    assignments: FatwaAssignment[];
+
     // 🔁 Many fatwas belong to one category
     @ManyToOne(() => FatwaCategory, (category) => category.fatwas, { eager: true })
-    @JoinColumn({name : 'category_id'})
+    @JoinColumn({ name: 'category_id' })
     category: FatwaCategory;
 
     @Column()
     client_id: number;
 
     // 🔐 Many fatwas belong to one user (a user can submit multiple queries)
-    @ManyToOne(() => User, (user) => user.fatwas, { eager: true})
+    @ManyToOne(() => User, (user) => user.fatwas, { eager: true })
     @JoinColumn({ name: 'client_id' })
     client: User;
 
+
+
     @Column({
-        type: 'smallint',
-        default: 1,
-        nullable: false,
-        comment: '0 = inactive, 1 = active',
+        type: 'enum',
+        enum: FatwaStatus,
+        default: FatwaStatus.PENDING,
     })
-    status: number;
+    status: FatwaStatus;
 
     @Column({ type: 'date' })
     created_at: string;

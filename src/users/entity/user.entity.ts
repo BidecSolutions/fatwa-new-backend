@@ -13,6 +13,7 @@ import { Exclude } from 'class-transformer';
 import { UserRole } from 'src/assig-roles-user/entity/user-role.entity';
 import { City } from 'src/city/entity/city.entity';
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
+import { FatwaAssignment } from 'src/fatwa-assignments/entity/fatwa-assignment.entity';
 
 @Entity()
 export class User {
@@ -40,6 +41,9 @@ export class User {
 
   @OneToMany(() => Fatwa, (fatwa) => fatwa.client)
   fatwas: Fatwa[];
+
+  @OneToMany(() => FatwaAssignment, (assignment) => assignment.user)
+  assignments: FatwaAssignment[];
   
 
 

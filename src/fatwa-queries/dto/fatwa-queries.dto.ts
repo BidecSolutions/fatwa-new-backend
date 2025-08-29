@@ -1,4 +1,6 @@
-import { IsString, IsBoolean, IsInt, IsOptional } from 'class-validator';
+import { IsString, IsInt, IsOptional, IsEnum } from 'class-validator';
+import { FatwaStatus } from 'src/common/enums/fatwah.enum';
+//import { FatwaStatus } from '../entity/fatwa-queries.entity';
 
 export class CreateFatwaDto {
   @IsString()
@@ -7,20 +9,12 @@ export class CreateFatwaDto {
   @IsString()
   question: string;
 
-  @IsOptional()
-  @IsString()
-  answer?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  reviewed?: boolean;
-
   @IsInt()
   categoryId: number;
 
-  @IsInt()
   @IsOptional()
-  clientId: number;
+  @IsInt()
+  clientId?: number;
 }
 
 export class UpdateFatwaDto {
@@ -33,18 +27,14 @@ export class UpdateFatwaDto {
   question?: string;
 
   @IsOptional()
-  @IsString()
-  answer?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  reviewed?: boolean;
-
-  @IsOptional()
   @IsInt()
   categoryId?: number;
 
   @IsOptional()
   @IsInt()
   clientId?: number;
+
+  @IsOptional()
+  @IsEnum(FatwaStatus)
+  status?: FatwaStatus;
 }

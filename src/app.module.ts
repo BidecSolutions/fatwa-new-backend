@@ -27,6 +27,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CityModule } from './city/city.module';
 import { CategoryModule } from './category/category.module';
 import { FatwaQueriesModule } from './fatwa-queries/fatwa-queries.module';
+import { FatwaAssignmentModule } from './fatwa-assignments/fatwa-assignments.module';
+
+
 
 @Module({
   imports: [
@@ -69,6 +72,7 @@ import { FatwaQueriesModule } from './fatwa-queries/fatwa-queries.module';
     CityModule,
     CategoryModule,
     FatwaQueriesModule,
+    FatwaAssignmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
