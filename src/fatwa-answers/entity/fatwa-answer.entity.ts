@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
   BeforeInsert,
-  BeforeUpdate,
+  
 } from 'typeorm';
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
 import { User } from 'src/users/entity/user.entity';
