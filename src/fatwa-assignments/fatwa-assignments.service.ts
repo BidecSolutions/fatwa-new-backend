@@ -19,33 +19,37 @@ export class FatwaAssignmentsService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   /** Create new assignment */
   async create(dto: CreateFatwaAssignmentDto) {
-    try {
-      const fatwa = await this.fatwaRepository.findOne({ where: { id: dto.fatwaId } });
-      if (!fatwa) throw new NotFoundException(`Fatwa #${dto.fatwaId} not found`);
+    const fatwa = await this.fatwaRepository.findOne({ where: { id: dto.fatwaId } });
+    if (!fatwa) throw new NotFoundException(`Fatwa #${dto.fatwaId} not found`);
 
-      const user = await this.userRepository.findOne({ where: { id: dto.userId } });
-      if (!user) throw new NotFoundException(`User #${dto.userId} not found`);
+    const user = await this.userRepository.findOne({
+      where: { id: dto.userId },
+      relations: ['userRoles', 'userRoles.role'],
+    });
+    if (!user) throw new NotFoundException(`User #${dto.userId} not found`);
 
-      const assignment = this.assignmentRepository.create({
-        fatwaQuery: fatwa,
-        user,
-        status: dto.status ? this.validateStatus(dto.status) : AssignmentStatus.PENDING,
-      });
+    this.validateUserRole(user);
 
-      const saved = await this.assignmentRepository.save(assignment);
+    const assignment = this.assignmentRepository.create({
+      fatwaQuery: fatwa,
+      user,
+      status: dto.status ?? AssignmentStatus.PENDING,
+    });
 
-      return {
-        success: true,
-        message: 'Fatwa assignment created successfully',
-        data: saved,
-      };
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    const saved = await this.assignmentRepository.save(assignment);
+
+    return {
+      success: true,
+      message: 'Fatwa assignment created successfully',
+      data: {
+        saved,
+        // user,
+      },
+    };
   }
 
   /** Fetch all assignments */
@@ -78,7 +82,7 @@ export class FatwaAssignmentsService {
   async update(id: number, dto: UpdateFatwaAssignmentDto) {
     const existing = await this.assignmentRepository.findOne({
       where: { id },
-      relations: ['fatwaQuery', 'user'],
+      relations: ['fatwaQuery', 'user', 'user.userRoles', 'user.userRoles.role'],
     });
     if (!existing) throw new NotFoundException(`Assignment #${id} not found`);
 
@@ -88,11 +92,17 @@ export class FatwaAssignmentsService {
       existing.fatwaQuery = fatwa;
     }
 
-    if (dto.userId) {
-      const user = await this.userRepository.findOne({ where: { id: dto.userId } });
-      if (!user) throw new NotFoundException(`User #${dto.userId} not found`);
-      existing.user = user;
-    }
+    // if (dto.userId) {/
+    const user = await this.userRepository.findOne({
+      where: { id: dto.userId },
+      relations: ['userRoles', 'userRoles.role'],
+    });
+    if (!user) throw new NotFoundException(`User #${dto.userId} not found`);
+
+    this.validateUserRole(user);
+
+    existing.user = user;
+    // }
 
     if (dto.status) {
       existing.status = this.validateStatus(dto.status);
@@ -103,7 +113,9 @@ export class FatwaAssignmentsService {
     return {
       success: true,
       message: 'Fatwa assignment updated successfully',
-      data: updated,
+      data: {
+        updated,
+      }
     };
   }
 
@@ -147,4 +159,17 @@ export class FatwaAssignmentsService {
     }
     return status as AssignmentStatus;
   }
+
+  private validateUserRole(user: User) {
+    const allowedRoles = ['teacher', 'student'];
+    const hasAllowedRole = user.userRoles.some((ur) =>
+      allowedRoles.includes(ur.role?.name?.toLowerCase())
+    );
+    if (!hasAllowedRole) {
+      throw new BadRequestException(
+        `you can only assign fatwa to ${allowedRoles.join(', ')}`
+      );
+    }
+  }
+
 }

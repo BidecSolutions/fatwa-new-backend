@@ -11,6 +11,7 @@ import { User } from 'src/users/entity/user.entity';
 import { FatwaCategory } from 'src/category/entity/category.entity';
 import { FatwaAssignment } from 'src/fatwa-assignments/entity/fatwa-assignment.entity';
 import { FatwaStatus } from 'src/common/enums/fatwah.enum';
+import { FatwaAnswer } from 'src/fatwa-answers/entity/fatwa-answer.entity';
 
 
 
@@ -31,6 +32,9 @@ export class Fatwa {
 
     @OneToMany(() => FatwaAssignment, (assignment) => assignment.fatwaQuery)
     assignments: FatwaAssignment[];
+
+    @OneToMany(() => FatwaAnswer, (answer) => answer.fatwa, { cascade: true })
+    answers: FatwaAnswer[];
 
     // 🔁 Many fatwas belong to one category
     @ManyToOne(() => FatwaCategory, (category) => category.fatwas, { eager: true })

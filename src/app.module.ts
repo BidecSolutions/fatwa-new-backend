@@ -28,6 +28,7 @@ import { CityModule } from './city/city.module';
 import { CategoryModule } from './category/category.module';
 import { FatwaQueriesModule } from './fatwa-queries/fatwa-queries.module';
 import { FatwaAssignmentModule } from './fatwa-assignments/fatwa-assignments.module';
+import { FatwaAnswersModule } from './fatwa-answers/fatwa-answers.module';
 
 
 
@@ -73,6 +74,7 @@ import { FatwaAssignmentModule } from './fatwa-assignments/fatwa-assignments.mod
     CategoryModule,
     FatwaQueriesModule,
     FatwaAssignmentModule,
+    FatwaAnswersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
