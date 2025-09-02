@@ -13,9 +13,9 @@ import { Exclude } from 'class-transformer';
 import { UserRole } from 'src/assig-roles-user/entity/user-role.entity';
 import { City } from 'src/city/entity/city.entity';
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
-//import { fatwa_student_assignments } from 'src/fatwa-assignments/entity/fatwa-student-assignment.entity';
 import { FatwaAnswer } from 'src/fatwa-answers/entity/fatwa-answer.entity';
 import { fatwa_student_assignments } from 'src/fatwa-student-assignments/entity/fatwa-student-assignment.entity';
+import { FatwaTeacherAssignment } from 'src/fatwa-teacher-assignments/entity/fatwa-teacher-assignments.entity';
 
 @Entity()
 export class User {
@@ -46,6 +46,9 @@ export class User {
 
   @OneToMany(() => fatwa_student_assignments, (assignment) => assignment.user)
   assignments: fatwa_student_assignments[];
+
+  @OneToMany(() => FatwaTeacherAssignment, (assignment) => assignment.teacher)
+  teacherAssignments: FatwaTeacherAssignment[];
 
   @OneToMany(() => FatwaAnswer, (answer) => answer.student)
   answers: FatwaAnswer[];

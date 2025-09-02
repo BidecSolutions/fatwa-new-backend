@@ -5,10 +5,12 @@ import {
   ManyToOne,
   JoinColumn,
   BeforeInsert,
+  OneToMany,
 
 } from 'typeorm';
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
 import { User } from 'src/users/entity/user.entity';
+import { FatwaTeacherAssignment } from 'src/fatwa-teacher-assignments/entity/fatwa-teacher-assignments.entity';
 
 @Entity()
 export class FatwaAnswer {
@@ -42,6 +44,9 @@ export class FatwaAnswer {
 
   @Column({ default: false })
   is_final: boolean;
+
+  @OneToMany(() => FatwaTeacherAssignment, (assignment) => assignment.fatwaAnswer)
+  teacherAssignments: FatwaTeacherAssignment[];
 
   @Column({ type: 'date' })
   created_at: string;

@@ -29,6 +29,7 @@ import { CategoryModule } from './category/category.module';
 import { FatwaQueriesModule } from './fatwa-queries/fatwa-queries.module';
 import { FatwaAnswersModule } from './fatwa-answers/fatwa-answers.module';
 import { FatwaAssignmentModule } from './fatwa-student-assignments/fatwa-student-assignments.module';
+import { FatwaTeacherAssignmentsModule } from './fatwa-teacher-assignments/fatwa-teacher-assignments.module';
 
 
 
@@ -75,6 +76,7 @@ import { FatwaAssignmentModule } from './fatwa-student-assignments/fatwa-student
     FatwaQueriesModule,
     FatwaAssignmentModule,
     FatwaAnswersModule,
+    FatwaTeacherAssignmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
