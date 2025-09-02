@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
   BeforeInsert,
-  
+
 } from 'typeorm';
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
 import { User } from 'src/users/entity/user.entity';
@@ -32,13 +32,16 @@ export class FatwaAnswer {
   @Column({ type: 'text' })
   content: string;
 
-  //@Column({
-   // type: 'int',
-   // nullable: false,
-   // default: 0,
-   // comment: '0 = no parent (top-level answer), otherwise stores parent answer id',
-  //})
-  //parent_answer_id: number;
+
+  // @Column({
+  //  type: 'int',
+  //  nullable: true,
+  //  comment: '0 = no parent (top-level answer), otherwise stores parent answer id',
+  // })
+  // parent_answer_id: number;
+
+  @Column({ default: false })
+  is_final: boolean;
 
   @Column({ type: 'date' })
   created_at: string;

@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Fatwa } from './entity/fatwa-queries.entity';
 import { FatwaCategory } from 'src/category/entity/category.entity';
 import { User } from 'src/users/entity/user.entity';
-import { FatwaAssignment } from 'src/fatwa-assignments/entity/fatwa-assignment.entity';
+import { fatwa_student_assignments } from 'src/fatwa-student-assignments/entity/fatwa-student-assignment.entity';
+
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Fatwa, User, FatwaCategory,FatwaAssignment])],
+  imports: [TypeOrmModule.forFeature([Fatwa, User, FatwaCategory,fatwa_student_assignments])],
   controllers: [FatwaQueriesController],
   providers: [FatwaQueriesService]
 })

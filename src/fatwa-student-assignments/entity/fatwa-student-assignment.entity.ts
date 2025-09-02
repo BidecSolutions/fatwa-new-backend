@@ -13,15 +13,18 @@ import { AssignmentStatus } from 'src/common/enums/fatwah.enum';
 
 
 
-@Entity('fatwa_assignments')
-export class FatwaAssignment {
+@Entity('fatwa_student_assignments')
+export class fatwa_student_assignments {
   @PrimaryGeneratedColumn()
   id: number;
-
+  @Column()
+  fatwa_query_id: number;
   @ManyToOne(() => Fatwa, (fatwa) => fatwa.assignments, { eager: true })
   @JoinColumn({ name: 'fatwa_query_id' })
   fatwaQuery: Fatwa;
 
+  @Column()
+  user_id: number;
   @ManyToOne(() => User, (user) => user.assignments, { eager: true })
   @JoinColumn({ name: 'user_id' })
   user: User;
@@ -29,7 +32,7 @@ export class FatwaAssignment {
   @Column({
     type: 'enum',
     enum: AssignmentStatus,
-    default: AssignmentStatus.PENDING,
+    default: AssignmentStatus.ASSIGNED,
   })
   status: AssignmentStatus;
 

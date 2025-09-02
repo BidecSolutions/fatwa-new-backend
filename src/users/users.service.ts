@@ -71,6 +71,7 @@ export class UsersService {
         data: saved,
       };
     } catch (err) {
+      console.log(err);
       this.handleUnknown(err);
     }
   }
@@ -79,10 +80,11 @@ export class UsersService {
   async idnex() {
     // kept the original route name; consider renaming to "index" later
     try {
-      const users = await this.userRepository.find();
+      const users = await this.userRepository.find({relations: ['userRoles', 'userRoles.role']});
       const data = users.map(({ password, access_token, ...rest }) => rest);
       return { success: true, message: 'User list', data };
     } catch (err) {
+      console.log(err);
       this.handleUnknown(err);
     }
   }
@@ -92,13 +94,14 @@ export class UsersService {
     try {
       const user = await this.userRepository.findOne({
         where: { id },
-        relations: ['details'],
+        relations: ['userRoles', 'userRoles.role'],
       });
       if (!user) throw new NotFoundException('User not found');
 
       const { password, access_token, ...clean } = user;
       return { success: true, message: 'User fetched', data: clean };
     } catch (err) {
+      console.log(err);
       this.handleUnknown(err);
     }
   }
@@ -108,7 +111,7 @@ export class UsersService {
     try {
       const user = await this.userRepository.findOne({
         where: { email },
-        relations: ['details'],
+        relations: ['userRoles', 'userRoles.role'],
       });
       if (!user) throw new NotFoundException('User not found');
 

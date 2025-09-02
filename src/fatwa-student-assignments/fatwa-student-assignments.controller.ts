@@ -1,4 +1,4 @@
-// src/fatwa-assignments/fatwa-assignments.controller.ts
+
 import {
   Body,
   Controller,
@@ -8,7 +8,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { FatwaAssignmentsService } from './fatwa-assignments.service';
+import { FatwaAssignmentsService } from './fatwa-student-assignments.service';
 import { CreateFatwaAssignmentDto, UpdateFatwaAssignmentDto } from './dto/fatwa-assignment.dto';
 import { AdminJwtAuthGuard } from 'src/auth/admin/admin-jwt.guard';
 

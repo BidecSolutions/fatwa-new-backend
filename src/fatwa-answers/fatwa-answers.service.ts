@@ -1,124 +1,119 @@
 import {
   Injectable,
-  NotFoundException,
   ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FatwaAnswer } from './entity/fatwa-answer.entity';
-import { User } from 'src/users/entity/user.entity';
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
-import {
-  CreateFatwaAnswerDto,
-  UpdateFatwaAnswerDto,
-} from './dto/fatwa-answer.dto';
+import { fatwa_student_assignments } from 'src/fatwa-student-assignments/entity/fatwa-student-assignment.entity';
 
 @Injectable()
-export class FatwaAnswerService {
+export class FatwaAnswersService {
   constructor(
     @InjectRepository(FatwaAnswer)
     private readonly answerRepo: Repository<FatwaAnswer>,
 
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
+    @InjectRepository(fatwa_student_assignments)
+    private readonly assignmentRepo: Repository<fatwa_student_assignments>,
 
     @InjectRepository(Fatwa)
     private readonly fatwaRepo: Repository<Fatwa>,
-  ) {}
+  ) { }
 
-  // ✅ Create Answer (student = logged-in user)
-  async create(dto: CreateFatwaAnswerDto, user: User) {
-    const fatwa = await this.fatwaRepo.findOne({ where: { id: dto.fatwa_id } });
-    if (!fatwa) throw new NotFoundException(`Fatwa #${dto.fatwa_id} not found`);
+  // ✅ Create Answer (only assigned student)
+  async create(fatwaId: number, studentId: number, content: string) {
+    const fatwa = await this.fatwaRepo.findOne({ where: { id: fatwaId } });
+    if (!fatwa) throw new NotFoundException(`Fatwa #${fatwaId} not found`);
 
-    const student = await this.userRepo.findOne({ where: { id: user.id } });
-    if (!student) throw new NotFoundException(`User #${user.id} not found`);
+    const existingAnswer = await this.answerRepo.findOne({
+      where: { fatwa_id: fatwaId, student_id: studentId },
+    });
+    if (existingAnswer) {
+      throw new ForbiddenException(`You have already submitted an answer for this fatwa`);
+    }
+    
 
     const answer = this.answerRepo.create({
-      content: dto.content,
-      fatwa,
-      student,
+      fatwa_id: fatwaId,
+      student_id: studentId,
+      content,
     });
 
-    const saved = await this.answerRepo.save(answer);
-
+    const savedAnswer = await this.answerRepo.save(answer);
     return {
       success: true,
-      message: 'Answer submitted successfully',
-      data: saved,
+      message: 'Answer created successfully',
+      data: savedAnswer,
     };
   }
 
-  // ✅ Admin: See all answers for a fatwa
-  async findByFatwaForAdmin(fatwaId: number) {
-    const fatwa = await this.fatwaRepo.findOne({ where: { id: fatwaId } });
-    if (!fatwa) throw new NotFoundException(`Fatwa #${fatwaId} not found`);
-
-    const answers = await this.answerRepo.find({
-      where: { fatwa: { id: fatwaId } },
-      relations: ['student', 'fatwa'],
-    });
+  async findAll(fatwaId?: number) {
+    const answers = fatwaId
+      ? await this.answerRepo.find({ where: { fatwa_id: fatwaId }, relations: ['fatwa'] })
+      : await this.answerRepo.find({ relations: ['fatwa'] });
 
     return {
       success: true,
-      message: `Answers for Fatwa #${fatwaId}`,
+      message: answers.length ? 'Answers fetched successfully' : 'No answers found',
       data: answers,
     };
   }
 
-  // ✅ User: See only their own answers for a fatwa
-  async findByFatwaForUser(fatwaId: number, user: User) {
-    const fatwa = await this.fatwaRepo.findOne({ where: { id: fatwaId } });
-    if (!fatwa) throw new NotFoundException(`Fatwa #${fatwaId} not found`);
-
-    const answers = await this.answerRepo.find({
-      where: { fatwa: { id: fatwaId }, student: { id: user.id } },
-      relations: ['student', 'fatwa'],
-    });
+  async findOne(id: number) {
+    const answer = await this.answerRepo.findOne({ where: { id }, relations: ['fatwa'] });
+    if (!answer) throw new NotFoundException(`Answer #${id} not found`);
 
     return {
       success: true,
-      message: `Your answers for Fatwa #${fatwaId}`,
-      data: answers,
+      message: 'Answer fetched successfully',
+      data: answer,
     };
   }
 
-  // ✅ Update (only your own answer)
-  async update(id: number, dto: UpdateFatwaAnswerDto, user: User) {
-    const answer = await this.answerRepo.findOne({
-      where: { id },
-      relations: ['student'],
-    });
 
-    if (!answer) throw new NotFoundException('Answer not found');
-    if (answer.student.id !== user.id) {
-      throw new ForbiddenException('You can only update your own answer');
+  async update(id: number, studentId: number, content: string) {
+    const answer = await this.answerRepo.findOne({ where: { id } });
+    if (!answer) throw new NotFoundException(`Answer #${id} not found`);
+
+    if (answer.student_id !== studentId) {
+      throw new ForbiddenException(`You are not allowed to update this answer`);
     }
 
-    Object.assign(answer, dto);
-    const updated = await this.answerRepo.save(answer);
+    const assignment = await this.assignmentRepo.findOne({
+      where: { fatwa_query_id: answer.fatwa_id, user_id: studentId }, // ✅ fixed
+    });
+    if (!assignment) {
+      throw new ForbiddenException(`You are not assigned to this fatwa`);
+    }
+
+    answer.content = content;
+    const updatedAnswer = await this.answerRepo.save(answer);
 
     return {
       success: true,
       message: 'Answer updated successfully',
-      data: updated,
+      data: updatedAnswer,
     };
   }
 
-  // ✅ Delete (only your own answer)
-  async delete(id: number, user: User) {
-    const answer = await this.answerRepo.findOne({
-      where: { id },
-      relations: ['student'],
-    });
-    if (!answer) throw new NotFoundException('Answer not found');
+  async remove(id: number, studentId: number) {
+    const answer = await this.answerRepo.findOne({ where: { id } });
+    if (!answer) throw new NotFoundException(`Answer #${id} not found`);
 
-    if (answer.student.id !== user.id) {
-      throw new ForbiddenException('You can only delete your own answer');
+    if (answer.student_id !== studentId) {
+      throw new ForbiddenException(`You are not allowed to delete this answer`);
     }
 
-    await this.answerRepo.delete(id);
+    const assignment = await this.assignmentRepo.findOne({
+      where: { fatwa_query_id: answer.fatwa_id, user_id: studentId }, // ✅ fixed
+    });
+    if (!assignment) {
+      throw new ForbiddenException(`You are not assigned to this fatwa`);
+    }
 
+    await this.answerRepo.remove(answer);
     return {
       success: true,
       message: 'Answer deleted successfully',

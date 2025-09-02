@@ -1,8 +1,8 @@
-// src/fatwa-assignments/fatwa-assignments.service.ts
+
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FatwaAssignment } from './entity/fatwa-assignment.entity';
+import { fatwa_student_assignments} from './entity/fatwa-student-assignment.entity';
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
 import { User } from 'src/users/entity/user.entity';
 import { CreateFatwaAssignmentDto, UpdateFatwaAssignmentDto } from './dto/fatwa-assignment.dto';
@@ -11,8 +11,8 @@ import { AssignmentStatus } from 'src/common/enums/fatwah.enum';
 @Injectable()
 export class FatwaAssignmentsService {
   constructor(
-    @InjectRepository(FatwaAssignment)
-    private readonly assignmentRepository: Repository<FatwaAssignment>,
+    @InjectRepository(fatwa_student_assignments)
+    private readonly assignmentRepository: Repository<fatwa_student_assignments>,
 
     @InjectRepository(Fatwa)
     private readonly fatwaRepository: Repository<Fatwa>,
@@ -31,13 +31,21 @@ export class FatwaAssignmentsService {
       relations: ['userRoles', 'userRoles.role'],
     });
     if (!user) throw new NotFoundException(`User #${dto.userId} not found`);
-
+    console.log(user);
     this.validateUserRole(user);
+    const existing = await this.assignmentRepository.findOne({
+      where: {fatwa_query_id: dto.fatwaId, user_id: dto.userId}
+    });
+    if (existing) {
+      throw new BadRequestException(`This fatwa is already assigned to this user`);
+    }
 
     const assignment = this.assignmentRepository.create({
       fatwaQuery: fatwa,
+      fatwa_query_id: fatwa.id,
+      user_id: user.id,
       user,
-      status: dto.status ?? AssignmentStatus.PENDING,
+      status: dto.status ?? AssignmentStatus.ASSIGNED,
     });
 
     const saved = await this.assignmentRepository.save(assignment);
@@ -125,11 +133,10 @@ export class FatwaAssignmentsService {
     if (!existing) throw new NotFoundException(`Assignment #${id} not found`);
 
     const flow: AssignmentStatus[] = [
-      AssignmentStatus.PENDING,
+      
       AssignmentStatus.ASSIGNED,
       AssignmentStatus.SUBMITTED,
-      AssignmentStatus.REVIEWED,
-      AssignmentStatus.COMPLETED,
+      
     ];
 
     let currentIndex = flow.indexOf(existing.status);

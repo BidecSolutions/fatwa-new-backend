@@ -9,9 +9,10 @@ import {
 } from 'typeorm';
 import { User } from 'src/users/entity/user.entity';
 import { FatwaCategory } from 'src/category/entity/category.entity';
-import { FatwaAssignment } from 'src/fatwa-assignments/entity/fatwa-assignment.entity';
+//import { fatwa_student_assignments } from 'src/fatwa-assignments/entity/fatwa-student-assignment.entity';
 import { FatwaStatus } from 'src/common/enums/fatwah.enum';
 import { FatwaAnswer } from 'src/fatwa-answers/entity/fatwa-answer.entity';
+import { fatwa_student_assignments } from 'src/fatwa-student-assignments/entity/fatwa-student-assignment.entity';
 
 
 
@@ -30,8 +31,8 @@ export class Fatwa {
     category_id: number;
 
 
-    @OneToMany(() => FatwaAssignment, (assignment) => assignment.fatwaQuery)
-    assignments: FatwaAssignment[];
+    @OneToMany(() => fatwa_student_assignments, (assignment) => assignment.fatwaQuery)
+    assignments: fatwa_student_assignments[];
 
     @OneToMany(() => FatwaAnswer, (answer) => answer.fatwa, { cascade: true })
     answers: FatwaAnswer[];

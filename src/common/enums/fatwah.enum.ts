@@ -8,9 +8,6 @@ export enum FatwaStatus {
 }
 
 export enum AssignmentStatus {
-  PENDING = 'pending',
   ASSIGNED = 'assigned',
   SUBMITTED = 'submitted',
-  REVIEWED = 'reviewed',
-  COMPLETED = 'completed',
 }

@@ -15,7 +15,7 @@ export class CreateFatwaAnswerDto {
 }
 
 export class UpdateFatwaAnswerDto {
-  @IsOptional()
   @IsString()
-  content?: string;
+  @IsNotEmpty()
+  content: string;
 }
