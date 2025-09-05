@@ -16,6 +16,7 @@ import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
 import { FatwaAnswer } from 'src/fatwa-answers/entity/fatwa-answer.entity';
 import { fatwa_student_assignments } from 'src/fatwa-student-assignments/entity/fatwa-student-assignment.entity';
 import { FatwaTeacherAssignment } from 'src/fatwa-teacher-assignments/entity/fatwa-teacher-assignments.entity';
+import { FatwaReview } from 'src/fatwa-reviews/entity/fatwa-reviews.entity';
 
 @Entity()
 export class User {
@@ -41,8 +42,12 @@ export class User {
   @Column({ nullable: true })
   gender: string;
 
+
   @OneToMany(() => Fatwa, (fatwa) => fatwa.client)
   fatwas: Fatwa[];
+
+  @OneToMany(() => FatwaReview, (review) => review.teacher)
+  fatwaReviews: FatwaReview[];
 
   @OneToMany(() => fatwa_student_assignments, (assignment) => assignment.user)
   assignments: fatwa_student_assignments[];

@@ -30,6 +30,7 @@ import { FatwaQueriesModule } from './fatwa-queries/fatwa-queries.module';
 import { FatwaAnswersModule } from './fatwa-answers/fatwa-answers.module';
 import { FatwaAssignmentModule } from './fatwa-student-assignments/fatwa-student-assignments.module';
 import { FatwaTeacherAssignmentsModule } from './fatwa-teacher-assignments/fatwa-teacher-assignments.module';
+import { FatwaReviewsModule } from './fatwa-reviews/fatwa-reviews.module';
 
 
 
@@ -77,6 +78,7 @@ import { FatwaTeacherAssignmentsModule } from './fatwa-teacher-assignments/fatwa
     FatwaAssignmentModule,
     FatwaAnswersModule,
     FatwaTeacherAssignmentsModule,
+    FatwaReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

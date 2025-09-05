@@ -11,6 +11,8 @@ import {
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
 import { User } from 'src/users/entity/user.entity';
 import { FatwaTeacherAssignment } from 'src/fatwa-teacher-assignments/entity/fatwa-teacher-assignments.entity';
+import { FatwaReview } from 'src/fatwa-reviews/entity/fatwa-reviews.entity';
+import { AssignmentStatus, ReviewStatus } from 'src/common/enums/fatwah.enum';
 
 @Entity()
 export class FatwaAnswer {
@@ -34,6 +36,16 @@ export class FatwaAnswer {
   @Column({ type: 'text' })
   content: string;
 
+  @Column({
+    type: 'enum',
+    enum: ReviewStatus,   // ✅ use ReviewStatus, not AssignmentStatus
+    default: ReviewStatus.SUBMITTED,
+    nullable: false,
+  })
+  status: ReviewStatus;
+
+
+
 
   // @Column({
   //  type: 'int',
@@ -47,6 +59,9 @@ export class FatwaAnswer {
 
   @OneToMany(() => FatwaTeacherAssignment, (assignment) => assignment.fatwaAnswer)
   teacherAssignments: FatwaTeacherAssignment[];
+
+  @OneToMany(() => FatwaReview, (review) => review.fatwaAnswer)
+  reviews: FatwaReview[];
 
   @Column({ type: 'date' })
   created_at: string;

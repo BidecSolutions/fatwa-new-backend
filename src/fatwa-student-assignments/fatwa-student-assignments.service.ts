@@ -6,7 +6,7 @@ import { fatwa_student_assignments} from './entity/fatwa-student-assignment.enti
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
 import { User } from 'src/users/entity/user.entity';
 import { CreateFatwaAssignmentDto, UpdateFatwaAssignmentDto } from './dto/fatwa-assignment.dto';
-import { AssignmentStatus } from 'src/common/enums/fatwah.enum';
+import { AssignmentStatus, FatwaStatus } from 'src/common/enums/fatwah.enum';
 
 @Injectable()
 export class FatwaAssignmentsService {
@@ -31,7 +31,7 @@ export class FatwaAssignmentsService {
       relations: ['userRoles', 'userRoles.role'],
     });
     if (!user) throw new NotFoundException(`User #${dto.userId} not found`);
-    console.log(user);
+    // console.log(user);
     this.validateUserRole(user);
     const existing = await this.assignmentRepository.findOne({
       where: {fatwa_query_id: dto.fatwaId, user_id: dto.userId}
@@ -49,7 +49,8 @@ export class FatwaAssignmentsService {
     });
 
     const saved = await this.assignmentRepository.save(assignment);
-
+    fatwa.status = FatwaStatus.ASSIGNED;
+    await this.fatwaRepository.save(fatwa);
     return {
       success: true,
       message: 'Fatwa assignment created successfully',

@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { FatwaAnswer } from './entity/fatwa-answer.entity';
 import { Fatwa } from 'src/fatwa-queries/entity/fatwa-queries.entity';
 import { fatwa_student_assignments } from 'src/fatwa-student-assignments/entity/fatwa-student-assignment.entity';
+import { AssignmentStatus, FatwaStatus, ReviewStatus } from 'src/common/enums/fatwah.enum';
 
 @Injectable()
 export class FatwaAnswersService {
@@ -23,31 +24,47 @@ export class FatwaAnswersService {
   ) { }
 
   // ✅ Create Answer (only assigned student)
-  async create(fatwaId: number, studentId: number, content: string) {
-    const fatwa = await this.fatwaRepo.findOne({ where: { id: fatwaId } });
-    if (!fatwa) throw new NotFoundException(`Fatwa #${fatwaId} not found`);
+  // ✅ Create Answer (only assigned student)
+async create(fatwaId: number, studentId: number, content: string) {
+  const fatwa = await this.fatwaRepo.findOne({ where: { id: fatwaId } });
+  if (!fatwa) throw new NotFoundException(`Fatwa #${fatwaId} not found`);
 
-    const existingAnswer = await this.answerRepo.findOne({
-      where: { fatwa_id: fatwaId, student_id: studentId },
-    });
-    if (existingAnswer) {
-      throw new ForbiddenException(`You have already submitted an answer for this fatwa`);
-    }
-    
-
-    const answer = this.answerRepo.create({
-      fatwa_id: fatwaId,
-      student_id: studentId,
-      content,
-    });
-
-    const savedAnswer = await this.answerRepo.save(answer);
-    return {
-      success: true,
-      message: 'Answer created successfully',
-      data: savedAnswer,
-    };
+  const existingAnswer = await this.answerRepo.findOne({
+    where: { fatwa_id: fatwaId, student_id: studentId },
+  });
+  if (existingAnswer) {
+    throw new ForbiddenException(`You have already submitted an answer for this fatwa`);
   }
+
+  const assignment = await this.assignmentRepo.findOne({
+    where: { fatwa_query_id: fatwaId, user_id: studentId },
+  });
+  if (!assignment) {
+    throw new ForbiddenException(`You are not assigned to this fatwa`);
+  }
+
+  
+  // ✅ Create answer with SUBMITTED status
+  const answer = this.answerRepo.create({
+    fatwa_id: fatwaId,
+    student_id: studentId,
+    content,
+    status: ReviewStatus.SUBMITTED, 
+  });
+  
+  const savedAnswer = await this.answerRepo.save(answer);
+  // ✅ Update assignment to SUBMITTED
+  assignment.status = AssignmentStatus.SUBMITTED;
+  await this.assignmentRepo.save(assignment);
+  fatwa.status= FatwaStatus.SUBMITTED;
+  await this.fatwaRepo.save(fatwa);
+
+  return {
+    success: true,
+    message: 'Answer created successfully',
+    data: savedAnswer,
+  };
+}
 
   async findAll(fatwaId?: number) {
     const answers = fatwaId
